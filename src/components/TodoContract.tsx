@@ -706,7 +706,8 @@ export default function TodoContract({
     );
   }
 
-  if (users.length < 1) {
+  // make sure not already in contract
+  if (users.length < 1 && !users.find((u) => u.id === user.uid)) {
     joinContract();
   }
   if (!userTodos[user.uid]) {
