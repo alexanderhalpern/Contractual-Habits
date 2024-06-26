@@ -115,7 +115,7 @@ const TodoList: React.FC<TodoListProps> = ({
               type="checkbox"
               checked={todo.completed}
               onChange={() => onToggle(todo.id)}
-              className="h-16 w-16 mr-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="h-12 w-12 mr-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               disabled={!contractSigned}
             />
           )}
