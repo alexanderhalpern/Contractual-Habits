@@ -548,25 +548,6 @@ export default function TodoContract({
     }
   };
 
-  if (!user) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-3xl font-bold mb-4 mx-8">
-          Welcome to Contractual Habits
-        </h1>
-        <b className="my-4 mx-12">
-          One of your friends has invited you to join a contract to keep you
-          accountable for reaching your goals, or else...
-        </b>
-        <Button onClick={signInWithGoogle}>Sign in with Google</Button>
-
-        <p className="my-4 text-xs mx-8">
-          To begin on your journey toward self-improvement, sign up above
-        </p>
-      </div>
-    );
-  }
-
   if (loading) {
     return (
       <div
@@ -590,6 +571,25 @@ export default function TodoContract({
           />
         </svg>
         <span className="sr-only">Loading...</span>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <h1 className="text-3xl font-bold mb-4 mx-8">
+          Welcome to Contractual Habits
+        </h1>
+        <b className="my-4 mx-12">
+          One of your friends has invited you to join a contract to keep you
+          accountable for reaching your goals, or else...
+        </b>
+        <Button onClick={signInWithGoogle}>Sign in with Google</Button>
+
+        <p className="my-4 text-xs mx-8">
+          To begin on your journey toward self-improvement, sign up above
+        </p>
       </div>
     );
   }
