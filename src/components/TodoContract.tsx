@@ -643,7 +643,7 @@ export default function TodoContract({
               <CardTitle>Your Contracts</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="container mx-auto p-4 max-w-2xl">
+              <div className="container mx-auto p-1 max-w-2xl">
                 {userContracts.map((contract) => (
                   <Card key={contract.id} className="mb-4">
                     <CardHeader>
@@ -677,7 +677,7 @@ export default function TodoContract({
               <CardDescription>Join an existing contract</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="container mx-auto p-4 max-w-2xl">
+              <div className="container mx-auto p-1 max-w-2xl">
                 {otherContracts.map((contract) => (
                   <Card key={contract.id} className="mb-4">
                     <CardHeader>
@@ -746,7 +746,11 @@ export default function TodoContract({
 
   return (
     <div className="container mx-auto p-4 max-w-2xl">
-      <h1 className="text-3xl font-bold mb-4 mt-4">Contractual Habits</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold mb-4 mt-4">Contractual Habits</h1>
+        {/* link to home */}
+        <Button onClick={() => router.push("/")}>Home</Button>
+      </div>
 
       {!userTodos[user.uid] && !contractSigned && (
         <Button onClick={joinContract} className="mb-4">
