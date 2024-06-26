@@ -865,7 +865,8 @@ export default function TodoContract({
           <CardHeader>
             <CardTitle>Punishment</CardTitle>
             <CardDescription>
-              What happens if you don't complete your tasks
+              When a person fails to complete all of their tasks for the week,
+              they will have to do the following:
             </CardDescription>
           </CardHeader>
           <CardContent>
