@@ -648,26 +648,32 @@ export default function TodoContract({
             </CardHeader>
             <CardContent>
               <div className="container mx-auto p-1">
-                {userContracts.map((contract) => (
-                  <Card key={contract.id} className="mb-4">
-                    <CardHeader>
-                      <CardTitle>{contract.name}</CardTitle>
-                      <CardDescription>
-                        Participants:{" "}
-                        {Object.values(contract.users || {})
-                          .map((user: any) => user.name)
-                          .join(", ")}
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button
-                        onClick={() => router.push(`/contract/${contract.id}`)}
-                      >
-                        View Contract
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                {userContracts
+                  .filter(
+                    (contract) => contract.name && contract.name.trim() !== ""
+                  )
+                  .map((contract) => (
+                    <Card key={contract.id} className="mb-4">
+                      <CardHeader>
+                        <CardTitle>{contract.name}</CardTitle>
+                        <CardDescription>
+                          Participants:{" "}
+                          {Object.values(contract.users || {})
+                            .map((user: any) => user.name)
+                            .join(", ")}
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Button
+                          onClick={() =>
+                            router.push(`/contract/${contract.id}`)
+                          }
+                        >
+                          View Contract
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
               </div>
             </CardContent>
           </div>
