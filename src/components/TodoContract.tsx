@@ -37,6 +37,7 @@ import {
 import { database, auth } from "@/lib/firebase";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { motion } from "framer-motion";
 
 interface Todo {
   id: string;
@@ -102,8 +103,11 @@ const TodoList: React.FC<TodoListProps> = ({
     )}
     <ul className="space-y-2">
       {todos.map((todo) => (
-        <li
+        <motion.li
           key={todo.id}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
           className="flex items-center space-x-2 justify-between"
         >
           {contractSigned && (
@@ -154,7 +158,6 @@ const TodoList: React.FC<TodoListProps> = ({
             className="flex justify-center items-center"
           >
             <CircularProgressbar
-              // className="w-60 h-60"
               styles={buildStyles({
                 pathColor: getProgressColor(
                   Math.min(
@@ -179,7 +182,7 @@ const TodoList: React.FC<TodoListProps> = ({
               ).toFixed(0)}%`}
             />
           </div>
-        </li>
+        </motion.li>
       ))}
     </ul>
   </div>
@@ -615,7 +618,7 @@ export default function TodoContract({
     );
 
     return (
-      <div className="container mx-auto p-4 max-w-2xl">
+      <div className="container mx-auto p-4 max-w-4xl">
         <h1 className="mt-4 mb-8 text-center text-3xl font-bold mb-4 w-full">
           📝 Contractual Habits 🤝
         </h1>
@@ -639,12 +642,12 @@ export default function TodoContract({
           </CardContent>
         </Card>
         {userContracts.length > 0 && (
-          <Card className="mt-4">
+          <div className="mt-4 w-full">
             <CardHeader>
               <CardTitle>Your Contracts</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="container mx-auto p-1 max-w-2xl">
+              <div className="container mx-auto p-1">
                 {userContracts.map((contract) => (
                   <Card key={contract.id} className="mb-4">
                     <CardHeader>
@@ -667,10 +670,10 @@ export default function TodoContract({
                 ))}
               </div>
             </CardContent>
-          </Card>
+          </div>
         )}
         {otherContracts.length > 0 && (
-          <Card className="mt-4">
+          <div className="mt-4 w-full">
             <CardHeader>
               <CardTitle>
                 Join Contracts in the Contractual Habits Community
@@ -678,7 +681,7 @@ export default function TodoContract({
               <CardDescription>Join an existing contract</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="container mx-auto p-1 max-w-2xl">
+              <div className="container mx-auto p-1">
                 {otherContracts.map((contract) => (
                   <Card key={contract.id} className="mb-4">
                     <CardHeader>
@@ -701,7 +704,7 @@ export default function TodoContract({
                 ))}
               </div>
             </CardContent>
-          </Card>
+          </div>
         )}
       </div>
     );
@@ -749,7 +752,7 @@ export default function TodoContract({
   }
 
   return (
-    <div className="container mx-auto p-4 max-w-2xl">
+    <div className="container mx-auto p-4 max-w-3xl">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold mb-4 mt-4">
           📝 Contractual Habits 🤝
@@ -924,7 +927,14 @@ export default function TodoContract({
                   {Object.values(userTodos)
                     .filter((user) => user.signature)
                     .map((user) => (
-                      <li key={user.name}>{user.name}</li>
+                      <motion.li
+                        key={user.name}
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {user.name}
+                      </motion.li>
                     ))}
                 </ul>
               </CardContent>
@@ -941,7 +951,14 @@ export default function TodoContract({
                   {Object.values(userTodos)
                     .filter((user) => !user.signature)
                     .map((user) => (
-                      <li key={user.name}>{user.name}</li>
+                      <motion.li
+                        key={user.name}
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        {user.name}
+                      </motion.li>
                     ))}
                 </ul>
               </CardContent>
