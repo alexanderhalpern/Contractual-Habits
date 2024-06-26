@@ -580,8 +580,9 @@ export default function TodoContract({
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-3xl font-bold mb-4 mx-8">
-          Welcome to Contractual Habits
+        <h1 className="text-3xl font-bold text-center mb-4 mx-8">
+          Welcome to
+          <br /> 📝 Contractual Habits 🤝
         </h1>
         <b className="my-4 mx-12">
           One of your friends has invited you to join a contract to keep you
@@ -616,7 +617,7 @@ export default function TodoContract({
     return (
       <div className="container mx-auto p-4 max-w-2xl">
         <h1 className="mt-4 mb-8 text-center text-3xl font-bold mb-4 w-full">
-          Contractual Habits
+          📝 Contractual Habits 🤝
         </h1>
         <Card>
           <CardHeader>
@@ -716,7 +717,7 @@ export default function TodoContract({
     return (
       <div className="container mx-auto p-4 max-w-2xl">
         <h1 className="text-center text-3xl font-bold mb-4 mt-4">
-          Contractual Habits
+          📝 Contractual Habits 🤝
         </h1>
         {/* this contract is between (show current members) */}
         <Card>
@@ -750,7 +751,9 @@ export default function TodoContract({
   return (
     <div className="container mx-auto p-4 max-w-2xl">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold mb-4 mt-4">Contractual Habits</h1>
+        <h1 className="text-2xl font-bold mb-4 mt-4">
+          📝 Contractual Habits 🤝
+        </h1>
         {/* link to home */}
         <Button onClick={() => router.push("/")}>Home</Button>
       </div>

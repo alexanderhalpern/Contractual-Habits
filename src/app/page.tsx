@@ -43,8 +43,9 @@ export default function Home() {
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-3xl font-bold mb-4 mx-8">
-          Welcome to Contractual Habits
+        <h1 className="text-3xl font-bold text-center mb-4 mx-8">
+          Welcome to
+          <br /> 📝 Contractual Habits 🤝
         </h1>
         <b className="my-4 mx-12">
           Invite your friends to keep you accountable for reaching your goals,
