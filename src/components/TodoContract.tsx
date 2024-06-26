@@ -623,7 +623,7 @@ export default function TodoContract({
           <CardHeader>
             <CardTitle>Create a New Contractual Habit</CardTitle>
             <CardDescription>
-              Share this link with your partners
+              Share this link with your friends!
             </CardDescription>
           </CardHeader>
           <CardContent>
