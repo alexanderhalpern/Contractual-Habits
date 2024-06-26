@@ -46,7 +46,7 @@ export default function Home() {
         <h1 className="text-3xl font-bold mb-4">
           Welcome to Contractual Habits
         </h1>
-        <b className="my-4">
+        <b className="my-4 mx-12">
           Invite your friends to keep you accountable for reaching your goals,
           or else...
         </b>
