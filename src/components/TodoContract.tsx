@@ -313,6 +313,8 @@ export default function TodoContract({
       onValue(weekLogRef, (snapshot) => {
         setWeekLog(snapshot.val() || []);
       });
+    } else {
+      setLoading(false);
     }
   }, [user, contractId]);
 
