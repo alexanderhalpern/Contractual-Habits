@@ -210,7 +210,7 @@ export default function TodoContract({
       .toISOString()
       .split("T")[0]
   );
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [checkingAuth, setCheckingAuth] = useState(true); // Add this line
 
@@ -707,9 +707,11 @@ export default function TodoContract({
   }
 
   // make sure not already in contract
-  if (users.length < 1 && !users.find((u) => u.id === user.uid)) {
+
+  if (users && users.length < 1 && !users.find((u) => u.id === user.uid)) {
     joinContract();
   }
+
   if (!userTodos[user.uid]) {
     return (
       <div className="container mx-auto p-4 max-w-2xl">
