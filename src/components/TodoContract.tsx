@@ -551,7 +551,7 @@ export default function TodoContract({
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <h1 className="text-3xl font-bold mb-4">
+        <h1 className="text-3xl font-bold mb-4 mx-8">
           Welcome to Contractual Habits
         </h1>
         <b className="my-4 mx-12">
@@ -560,7 +560,7 @@ export default function TodoContract({
         </b>
         <Button onClick={signInWithGoogle}>Sign in with Google</Button>
 
-        <p className="my-4 text-xs">
+        <p className="my-4 text-xs mx-8">
           To begin on your journey toward self-improvement, sign up above
         </p>
       </div>
