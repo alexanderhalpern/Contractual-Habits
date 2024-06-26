@@ -44,9 +44,17 @@ export default function Home() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <h1 className="text-3xl font-bold mb-4">
-          Welcome to Todo Contract App
+          Welcome to Contractual Habits
         </h1>
+        <b className="my-4">
+          Invite your friends to keep you accountable for reaching your goals,
+          or else...
+        </b>
         <Button onClick={signInWithGoogle}>Sign in with Google</Button>
+
+        <p className="my-4 text-xs">
+          To begin on your journey toward self-improvement, sign up above
+        </p>
       </div>
     );
   }

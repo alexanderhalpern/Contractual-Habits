@@ -17,6 +17,7 @@ import SignatureCanvas from "react-signature-canvas";
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -93,6 +94,12 @@ const TodoList: React.FC<TodoListProps> = ({
 }) => (
   <div>
     <h3 className="text-xl font-semibold mb-2">{userName}'s To-Do List</h3>
+
+    {todos.length === 0 && (
+      <p className="text-sm text-gray-500">
+        This slacker hasn't put any tasks in yet.
+      </p>
+    )}
     <ul className="space-y-2">
       {todos.map((todo) => (
         <li
@@ -108,7 +115,7 @@ const TodoList: React.FC<TodoListProps> = ({
               disabled={!contractSigned}
             />
           )}
-          <span className={todo.completed ? "line-through" : ""}>
+          <span className={todo.completed ? "w-full line-through" : "w-full"}>
             {todo.text}
           </span>
           {isEditable && !contractSigned && (
@@ -133,14 +140,21 @@ const TodoList: React.FC<TodoListProps> = ({
               </button>
             </>
           )}
+          {!isEditable && !contractSigned && (
+            <span className="w-full">{todo.timesPerWeek} times per week</span>
+          )}
           {contractSigned && (
             <span className="w-full">
               {getCompletedThisWeek(todo.completionDays)} / {todo.timesPerWeek}{" "}
-              times per week
+              times this week
             </span>
           )}
-          <div style={{ width: 70, height: 70 }}>
+          <div
+            style={{ width: 120 }}
+            className="flex justify-center items-center"
+          >
             <CircularProgressbar
+              // className="w-60 h-60"
               styles={buildStyles({
                 pathColor: getProgressColor(
                   Math.min(
@@ -191,8 +205,15 @@ export default function TodoContract({
   const [punishment, setPunishment] = useState("");
   const [contractName, setContractName] = useState("");
   const [allContracts, setAllContracts] = useState<any[]>([]);
+  const [endDate, setEndDate] = useState<string>(
+    new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+      .toISOString()
+      .split("T")[0]
+  );
 
   const [weekLog, setWeekLog] = useState<any[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const sigCanvas = useRef<SignatureCanvas>(null);
 
   useEffect(() => {
@@ -225,6 +246,13 @@ export default function TodoContract({
     }
   }, [user, isBaseUrl, contractId]);
 
+  const updateEndDate = (date: string) => {
+    if (contractId) {
+      const endDateRef = ref(database, `contracts/${contractId}/endDate`);
+      set(endDateRef, date);
+    }
+  };
+
   useEffect(() => {
     if (user && contractId) {
       const contractRef = ref(database, `contracts/${contractId}`);
@@ -232,6 +260,12 @@ export default function TodoContract({
         const data = snapshot.val();
         if (data) {
           setContractName(data.name || "");
+          setEndDate(
+            data.endDate ||
+              new Date(new Date().setFullYear(new Date().getFullYear() + 1))
+                .toISOString()
+                .split("T")[0]
+          );
           const updatedUserTodos: UserTodos = {};
           Object.entries(data.users).forEach(
             ([userId, userData]: [string, any]) => {
@@ -348,6 +382,13 @@ export default function TodoContract({
 
   const signContract = async () => {
     if (user && contractId && sigCanvas.current) {
+      if (Object.keys(userTodos).length < 2) {
+        setErrorMessage(
+          "You need at least two people in the contract to sign it."
+        );
+        return;
+      }
+
       const signatureDataUrl = sigCanvas.current.toDataURL();
       const userRef = ref(
         database,
@@ -416,7 +457,7 @@ export default function TodoContract({
   };
 
   const joinContract = async () => {
-    if (user && contractId) {
+    if (user && contractId && !contractSigned) {
       const userRef = ref(
         database,
         `contracts/${contractId}/users/${user.uid}`
@@ -496,6 +537,18 @@ export default function TodoContract({
   }
 
   if (isBaseUrl) {
+    const userContracts = allContracts.filter(
+      (contract) =>
+        contract.users && Object.keys(contract.users).includes(user?.uid || "")
+    );
+
+    const otherContracts = allContracts.filter(
+      (contract) =>
+        contract.name &&
+        contract.name.trim() !== "" &&
+        !Object.keys(contract.users || {}).includes(user?.uid || "")
+    );
+
     return (
       <div className="container mx-auto p-4 max-w-2xl">
         <h1 className="mt-4 mb-8 text-center text-3xl font-bold mb-4 w-full">
@@ -520,16 +573,14 @@ export default function TodoContract({
             </div>
           </CardContent>
         </Card>
-        {allContracts.length > 0 && (
+        {userContracts.length > 0 && (
           <Card className="mt-4">
             <CardHeader>
-              <CardTitle>Available Contracts</CardTitle>
-
-              <CardDescription>Join an existing contract</CardDescription>
+              <CardTitle>Your Contracts</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="container mx-auto p-4 max-w-2xl">
-                {allContracts.map((contract) => (
+                {userContracts.map((contract) => (
                   <Card key={contract.id} className="mb-4">
                     <CardHeader>
                       <CardTitle>{contract.name}</CardTitle>
@@ -553,6 +604,79 @@ export default function TodoContract({
             </CardContent>
           </Card>
         )}
+        {otherContracts.length > 0 && (
+          <Card className="mt-4">
+            <CardHeader>
+              <CardTitle>
+                Join Contracts in the Contractual Habits Community
+              </CardTitle>
+              <CardDescription>Join an existing contract</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="container mx-auto p-4 max-w-2xl">
+                {otherContracts.map((contract) => (
+                  <Card key={contract.id} className="mb-4">
+                    <CardHeader>
+                      <CardTitle>{contract.name}</CardTitle>
+                      <CardDescription>
+                        Participants:{" "}
+                        {Object.values(contract.users || {})
+                          .map((user: any) => user.name)
+                          .join(", ")}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button
+                        onClick={() => router.push(`/contract/${contract.id}`)}
+                      >
+                        View Contract
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    );
+  }
+
+  // if there are no users, auto join the contract
+
+  if (Object.keys(userTodos).length === 0) {
+    joinContract();
+  }
+
+  if (!userTodos[user.uid]) {
+    return (
+      <div className="container mx-auto p-4 max-w-2xl">
+        <h1 className="text-3xl font-bold mb-4 mt-4">Contractual Habits</h1>
+        {/* this contract is between (show current members) */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Join the Contract</CardTitle>
+            <CardDescription>
+              You have been invited to join this contract
+            </CardDescription>
+          </CardHeader>
+        </Card>
+        <Card className="mt-4">
+          <CardHeader>
+            <CardTitle>Current Members</CardTitle>
+            <CardDescription>
+              The following people are already in this contract
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {Object.values(userTodos)
+              .map((user) => user.name)
+              .join(", ")}
+          </CardContent>
+        </Card>
+        <Button onClick={joinContract} className="mb-4">
+          Join the Contract
+        </Button>
       </div>
     );
   }
@@ -692,12 +816,99 @@ export default function TodoContract({
         </Card>
       )}
 
+      <Card className="mb-4">
+        <CardHeader>
+          <CardTitle>Contract End Date</CardTitle>
+          <CardDescription>Set an end date for this contract</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!contractSigned ? (
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                updateEndDate(e.target.value);
+              }}
+              className="flex-grow"
+            />
+          ) : (
+            <p>{endDate}</p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* check if the contract has already been signed by any users yet */}
+      {!contractSigned && (
+        <>
+          {Object.values(userTodos).some((user) => user.signature) && (
+            <Card className="mb-4">
+              <CardHeader>
+                <CardTitle>Users Who Have Already Signed</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc list-inside">
+                  {Object.values(userTodos)
+                    .filter((user) => user.signature)
+                    .map((user) => (
+                      <li key={user.name}>{user.name}</li>
+                    ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+
+          {Object.values(userTodos).some((user) => !user.signature) && (
+            <Card className="mb-4">
+              <CardHeader>
+                <CardTitle>Users Who Still Need to Sign</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul className="list-disc list-inside">
+                  {Object.values(userTodos)
+                    .filter((user) => !user.signature)
+                    .map((user) => (
+                      <li key={user.name}>{user.name}</li>
+                    ))}
+                </ul>
+              </CardContent>
+            </Card>
+          )}
+
+          <p className="mb-4 text-sm mx-4">
+            By signing this contract, you are entering into a legally binding
+            agreement with{" "}
+            {Object.values(userTodos).length > 1
+              ? Object.values(userTodos).map((user, index, array) => {
+                  if (index === array.length - 1) return ` and ${user.name}`;
+                  if (index === array.length - 2) return user.name;
+                  return `${user.name}, `;
+                })
+              : Object.values(userTodos).map((user) => user.name)}
+            . Once this contract is signed, you will be bound by its terms and
+            conditions until its expiration date on {endDate}. Early termination
+            of this contract is not permitted.
+          </p>
+        </>
+      )}
+
+      {errorMessage && (
+        <div className="text-red-500 text-center mb-4">{errorMessage}</div>
+      )}
+
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button className="w-full" disabled={contractSigned}>
+          <Button
+            className="w-full"
+            disabled={
+              contractSigned ||
+              (userTodos[user.uid] && userTodos[user.uid].signature)
+            }
+          >
             {contractSigned ? "Contract Signed" : "Sign Contract"}
           </Button>
         </AlertDialogTrigger>
+
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Sign the Contract</AlertDialogTitle>
@@ -716,7 +927,10 @@ export default function TodoContract({
             />
           </div>
           <AlertDialogFooter>
-            <Button onClick={() => sigCanvas.current?.clear()}>Clear</Button>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button onClick={() => sigCanvas.current?.clear()}>
+              Clear Signature
+            </Button>
             <AlertDialogAction onClick={signContract}>
               Sign Contract
             </AlertDialogAction>
