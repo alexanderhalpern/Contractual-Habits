@@ -567,7 +567,7 @@ export default function TodoContract({
         </Button>
       )}
 
-      {!contractSigned && (
+      {userTodos[user.uid] && !contractSigned && (
         <Card className="mb-4">
           <CardHeader>
             <CardTitle>Contract Name</CardTitle>
@@ -660,35 +660,37 @@ export default function TodoContract({
           )
       )}
 
-      <Card className="mb-4">
-        <CardHeader>
-          <CardTitle>Punishment</CardTitle>
-          <CardDescription>
-            What happens if you don't complete your tasks
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!contractSigned ? (
-            <Input
-              type="text"
-              value={punishment}
-              onChange={(e) => {
-                if (user && contractId) {
-                  const punishmentRef = ref(
-                    database,
-                    `contracts/${contractId}/punishment`
-                  );
-                  set(punishmentRef, e.target.value);
-                }
-              }}
-              placeholder="Enter punishment here"
-              className="flex-grow"
-            />
-          ) : (
-            <p>{punishment}</p>
-          )}
-        </CardContent>
-      </Card>
+      {userTodos[user.uid] && (
+        <Card className="mb-4">
+          <CardHeader>
+            <CardTitle>Punishment</CardTitle>
+            <CardDescription>
+              What happens if you don't complete your tasks
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!contractSigned ? (
+              <Input
+                type="text"
+                value={punishment}
+                onChange={(e) => {
+                  if (user && contractId) {
+                    const punishmentRef = ref(
+                      database,
+                      `contracts/${contractId}/punishment`
+                    );
+                    set(punishmentRef, e.target.value);
+                  }
+                }}
+                placeholder="Enter punishment here"
+                className="flex-grow"
+              />
+            ) : (
+              <p>{punishment}</p>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <AlertDialog>
         <AlertDialogTrigger asChild>
