@@ -227,7 +227,7 @@ export default function TodoContract({
       setUser(currentUser);
     });
     return () => unsubscribe();
-  }, []);
+  }, [contractId]);
 
   useEffect(() => {
     console.log(user, isBaseUrl, contractId);
@@ -273,7 +273,7 @@ export default function TodoContract({
                 .split("T")[0]
           );
           const updatedUserTodos: UserTodos = {};
-          const userArray: any[] = []; // Initialize the user array
+          const userArray: any[] = [];
 
           Object.entries(data.users).forEach(
             ([userId, userData]: [string, any]) => {
@@ -285,22 +285,37 @@ export default function TodoContract({
                         id: todoId,
                         ...todo,
                         completionDays: todo.completionDays || [],
+                        completed: isCompletedToday(todo.completionDays || []),
                       })
                     )
                   : [],
                 signature: userData.signature || undefined,
               };
-              userArray.push({ id: userId, ...userData }); // Push user data into the array
+              userArray.push({ id: userId, ...userData });
             }
           );
           setUserTodos(updatedUserTodos);
-          setUsers(userArray); // Set the users state
+          setUsers(userArray);
         } else {
           setUserTodos({});
-          setUsers([]); // Clear the users state if no data
+          setUsers([]);
         }
-        setLoading(false); // Set loading to false after fetching data
+        setLoading(false);
       });
+
+      console.log("contractId", initialContractId);
+
+      // if name doesnt exist and contractID exists, set name to {user.displayName}'s Contract
+      if (initialContractId) {
+        console.log("contractId", initialContractId);
+        const contractNameRef = ref(database, `contracts/${contractId}/name`);
+        onValue(contractNameRef, (snapshot) => {
+          if (!snapshot.val()) {
+            setContractName(`${user.displayName}'s Contract`);
+            updateContractName(`${user.displayName}'s Contract`);
+          }
+        });
+      }
 
       const signedRef = ref(database, `contracts/${contractId}/signed`);
       onValue(signedRef, (snapshot) => {
@@ -320,6 +335,11 @@ export default function TodoContract({
       setLoading(false);
     }
   }, [user, contractId]);
+
+  const isCompletedToday = (completionDays: string[]) => {
+    const today = new Date().toISOString().split("T")[0];
+    return completionDays.includes(today);
+  };
 
   const updateContractName = (name: string) => {
     if (contractId) {
@@ -383,17 +403,15 @@ export default function TodoContract({
         const today = new Date().toISOString().split("T")[0];
         let completionDays = todo.completionDays || [];
 
-        if (todo.completed) {
+        if (completionDays.includes(today)) {
           completionDays = completionDays.filter((date) => date !== today);
         } else {
-          if (!completionDays.includes(today)) {
-            completionDays.push(today);
-          }
+          completionDays.push(today);
         }
 
         await set(todoRef, {
           ...todo,
-          completed: !todo.completed,
+          completed: completionDays.includes(today),
           completionDays,
         });
       }
@@ -486,13 +504,13 @@ export default function TodoContract({
     alert("Contract link copied to clipboard!");
   };
 
-  const joinContract = async () => {
-    if (user && contractId && !contractSigned) {
+  const joinContract = async (currentUser: User) => {
+    if (currentUser && contractId && !contractSigned) {
       const userRef = ref(
         database,
-        `contracts/${contractId}/users/${user.uid}`
+        `contracts/${contractId}/users/${currentUser.uid}`
       );
-      await set(userRef, { name: user.displayName || "Anonymous" });
+      await set(userRef, { name: currentUser.displayName || "Anonymous" });
     }
   };
 
@@ -700,11 +718,15 @@ export default function TodoContract({
                       </CardDescription>
                     </CardHeader>
                     <CardContent>
-                      <Button
-                        onClick={() => router.push(`/contract/${contract.id}`)}
-                      >
-                        View Contract
-                      </Button>
+                      {/* show punishment, end date, and other data */}
+                      {/* no button */}
+
+                      <span className="text-sm">
+                        Punishment: {contract.punishment}
+                      </span>
+                      <span className="text-sm">
+                        End Date: {contract.endDate}
+                      </span>
                     </CardContent>
                   </Card>
                 ))}
@@ -716,45 +738,13 @@ export default function TodoContract({
     );
   }
 
-  // make sure not already in contract
-
-  if (users && users.length < 1 && !users.find((u) => u.id === user.uid)) {
-    joinContract();
-  }
-
-  if (!userTodos[user.uid]) {
-    return (
-      <div className="container mx-auto p-4 max-w-2xl">
-        <h1 className="text-center text-3xl font-bold mb-4 mt-4">
-          📝 Contractual Habits 🤝
-        </h1>
-        {/* this contract is between (show current members) */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Join the Contract</CardTitle>
-            <CardDescription>Feel free to join this contract</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card className="mt-4">
-          <CardHeader>
-            <CardTitle>Current Members</CardTitle>
-            <CardDescription>
-              The following people are already in this contract
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {Object.values(userTodos)
-              .map((user) => user.name)
-              .join(", ")}
-          </CardContent>
-        </Card>
-        <div className="flex items-center justify-center">
-          <Button onClick={joinContract} className="mt-4">
-            Join the Contract
-          </Button>
-        </div>
-      </div>
-    );
+  if (
+    user &&
+    initialContractId &&
+    users &&
+    !users.find((u) => u.id === user.uid)
+  ) {
+    joinContract(user);
   }
 
   return (
@@ -766,12 +756,6 @@ export default function TodoContract({
         {/* link to home */}
         <Button onClick={() => router.push("/")}>Home</Button>
       </div>
-
-      {!userTodos[user.uid] && !contractSigned && (
-        <Button onClick={joinContract} className="mb-4">
-          Join Contract
-        </Button>
-      )}
 
       {userTodos[user.uid] && !contractSigned && (
         <Card className="mb-4">
