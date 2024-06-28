@@ -717,17 +717,21 @@ export default function TodoContract({
                           .join(", ")}
                       </CardDescription>
                     </CardHeader>
-                    <CardContent>
-                      {/* show punishment, end date, and other data */}
-                      {/* no button */}
-
-                      <span className="text-sm">
-                        Punishment: {contract.punishment}
-                      </span>
-                      <span className="text-sm">
-                        End Date: {contract.endDate}
-                      </span>
-                    </CardContent>
+                    {(contract.punishment || contract.endDate) && (
+                      <CardContent>
+                        {contract.punishment && (
+                          <span className="text-sm">
+                            Punishment: {contract.punishment}
+                          </span>
+                        )}
+                        <br />
+                        {contract.endDate && (
+                          <span className="text-sm">
+                            End Date: {contract.endDate}
+                          </span>
+                        )}
+                      </CardContent>
+                    )}
                   </Card>
                 ))}
               </div>
