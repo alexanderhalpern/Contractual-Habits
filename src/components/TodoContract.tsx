@@ -702,7 +702,9 @@ export default function TodoContract({
               <CardTitle>
                 View Other Contracts in the Contractual Habits Community
               </CardTitle>
-              <CardDescription>Join an existing contract</CardDescription>
+              <CardDescription>
+                Check out what other people are working toward
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="container mx-auto p-1">
