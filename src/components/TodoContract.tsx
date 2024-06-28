@@ -700,7 +700,7 @@ export default function TodoContract({
           <div className="mt-4 w-full">
             <CardHeader>
               <CardTitle>
-                Join Contracts in the Contractual Habits Community
+                View Other Contracts in the Contractual Habits Community
               </CardTitle>
               <CardDescription>Join an existing contract</CardDescription>
             </CardHeader>
